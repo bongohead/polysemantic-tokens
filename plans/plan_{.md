@@ -55,6 +55,28 @@ Use approximate distributions, not exact quotas.
 - Openings: avoid starting any sample with the target token. Also avoid starting with a bare `{` unless it is clearly a real artifact and the exact token still appears later.
 - Formatting: multiline samples are useful for this token, especially code and templates, but keep YAML valid.
 
+## Iteration Learnings From `dsv2/samples_{.yaml`
+
+The hardest failure mode for this token was not semantic choice; it was structural overcorrection. When `placeholder_token` became less like flat template listings, it swung too far into a repeated partial-render-failure story. Future edits should keep these specific lessons in view:
+
+- `placeholder_token` must not be dominated by vertical `field = text { variable }` lists. Some are natural, but too many make the section read like one generator template with different nouns.
+- The opposite failure is also bad: do not replace all flat template lists with "some fields rendered, some stayed raw" stories. A few support tickets, QA failures, logs, and complaints are good; they should be a minority, not the section's main narrative arc.
+- Add many intentionally raw artifacts where nothing is broken and no one comments on the braces: `.properties`, `.po`, `.tmx`, `.xlf`, `.env.sample`, SQL templates, PR/issue templates, ZPL, SRT, ICS, RESX, HL7, Helm values, route docs, canned replies, receipt layouts, runbooks, and source-like fixture files.
+- Prefer being the artifact over describing the artifact. Replace "the preview failed because..." with the actual preview text, log line, fixture, diff, or template fragment.
+- Be suspicious of opening labels like `Venue sign proof PDF:`, `clinic reminder callback complaint`, `l10n QA mismatch`, or `Downloaded firewall PDF:`. Some filenames and artifact headers are real, but a lot of colon-intro openings are curator framing in disguise.
+- For placeholder samples, include enough context before the first placeholder to make it clear that the braces are template slots, but do it subtly through surrounding source text, fields, headers, or rows rather than a meta-introduction.
+- Double-brace template examples are risky for this exact token because many tokenizers may treat `{{` as its own token. Prefer single-brace placeholders. If double braces appear at all, keep them rare and make sure the exact `" {"` occurrence is still unambiguously a placeholder.
+- `.env` and route examples can accidentally miss the exact token if written as `KEY={ value }` or `/path/{ id }` only. Include spaced assignments or surrounding prose such as `KEY = { value }` when the sample otherwise lacks `" {"`.
+- Keep some confused, angry, or wrong human voices, but do not turn the whole label into a joke about broken personalization. Real corpora have lots of quiet raw templates and documentation examples.
+
+Other repeated fixes:
+
+- `set_notation` initially leaned too educational. Keep research papers, formal specs, database docs, standards text, protocol definitions, eligibility criteria, and dry technical appendices in the mix, not only worksheets, lecture notes, and homework forums.
+- `set_notation` also tends to acquire epilogues like "student asked..." or "the export dropped...". Embed the mess directly or omit the commentary.
+- Avoid set-like programming literals under `set_notation` unless the surrounding text clearly treats them as mathematical sets. `allowed_statuses = {draft,...}` and game/config value lists blur the label.
+- `programming_block_delimiter` can over-index on beginner forum posts about missing braces. Preserve pure source files, generated code, config blocks, CSS, CI excerpts, and long nested blocks with zero explanatory wrapper.
+- In programming samples, keep scanning for `return {`, `= {`, and object/initializer literals. They are the easiest way to introduce a wrong-label exact token.
+
 ## `set_notation`
 
 Semantic rule: `" {"` opens mathematical set notation: finite set literals, set-builder notation, families/classes of sets, sample spaces, events, domains, alphabets, equivalence classes, solution sets, or similar set-denoting mathematical collections.
@@ -142,7 +164,7 @@ Good examples:
 - `Order {order_id} is ready`
 - `Dear { recipient },`
 - `Subject: Reset code {CODE}`
-- `greeting: "Hi {{ user_name }}"` when used by a template engine
+- `greeting: "Hi { user_name }"` in a template or fixture file
 - `endpoint {baseURL}/v1/users`
 
 Include:
@@ -165,10 +187,11 @@ Exclude:
 Guidance:
 
 - The placeholder should feel like unresolved templated text, not an explanation of what placeholders are.
-- Use many template syntaxes inside realistic surrounding text: `Dear {Name}`, `value: { user_name }`, `code {ORDER_ID}`, `Hi {{ customer.first_name }}`, `slot {0}`, `items {count}`, `host {base_url}`, and product-specific merge fields.
-- Double-brace templates are allowed if the exact `" {"` occurrence clearly opens a placeholder delimiter.
+- Use many template syntaxes inside realistic surrounding text: `Dear {Name}`, `value: { user_name }`, `code {ORDER_ID}`, `Hi { customer.first_name }`, `slot {0}`, `items {count}`, `host {base_url}`, and product-specific merge fields.
+- Prefer single-brace template syntaxes for this exact token. Double-brace templates are only acceptable as rare incidental variation, and only if the exact `" {"` occurrence clearly opens a placeholder rather than primarily training the model on a `{{` token.
 - ICU/message-format snippets are allowed only when each exact `" {"` is a substitution field. Avoid plural/select syntax if nested braces would make the role hard to classify.
-- Include realistic unreplaced-placeholder failures: emails sent with `{FirstName}`, logs saying missing value for `{account_id}`, preview pages with `{hero_copy}`, or support macros leaking `{case_link}`.
+- Include realistic unreplaced-placeholder failures: emails sent with `{FirstName}`, logs saying missing value for `{account_id}`, preview pages with `{hero_copy}`, or support macros leaking `{case_link}`. Keep these as one source type among many, not the dominant arc.
+- Include many quiet, intentionally raw templates and fixtures where all placeholders remain raw by design and nothing has failed.
 - Avoid starting most samples with formal salutations. Mix in raw localization rows, config comments, CSV exports, app strings, OCR snippets, chat transcripts, and ticket notes.
 
 ## Iterative Build Strategy
@@ -229,7 +252,11 @@ Per meaning:
 Final review:
 
 - Run a token occurrence scan and inspect all lines around `" {"`.
+- Run `python scripts/check_length_distribution.py 'dsv2/samples_{.yaml'` and `python scripts/check_length_distribution.py 'dsv2/samples_{.yaml' --metric words`; use the results as a warning signal, not as an exact target.
 - Confirm each label has 100 samples.
 - Confirm the final distribution includes code/config, math/proofs, templates, messy scraped artifacts, educational text, logs, tables, forum/chat/email fragments, and longer sequences where appropriate.
 - Read for repeated "competent explainer" voice and replace those with rawer artifacts.
+- Read for repeated narrative arcs, especially placeholder flat key-value listings, placeholder partial-render failures, set notation followed by a student/margin/export epilogue, and programming snippets followed by a forum brace-error explanation.
+- For `placeholder_token`, run a rough smell scan for terms such as `rendered`, `stayed raw`, `unresolved`, `blank`, `preview`, `QA`, and `complaint`. The exact count is crude, but a high count means the broken-render story is probably dominating again.
+- Run a high-risk literal scan for double braces, TeX grouping, shell brace expansion, object literals, code set literals, and route/config examples that might lack the exact token.
 - Recheck YAML validity after any multiline edits.

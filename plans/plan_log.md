@@ -221,3 +221,40 @@ Per meaning:
 - Has target tokens distributed across early, middle, and late positions, especially in longer samples.
 - Includes short fragments, medium artifacts, and some long messy samples.
 - Manually inspect high-risk cases where software logs, math logs, and wood logs can appear near each other.
+
+## 2026-05-04 Cleanup Review
+
+This pass specifically targeted the remaining review notes: capper endings, the wood label-line habit, and the duplicated astronomy homework.
+
+Answers to `always_check.md` after this pass:
+
+1. Correct meaning: yes, checked the edited samples. The replacement astronomy sample keeps ` log` in `log_rate` and ` log rate`, both logarithm-derived; wood edits use physical logs; record edits use event/file records.
+2. Type and messiness diversity: improved, but I am treating this harshly. The dataset still has many tidy artifacts, but this pass added more mid-page prose, complaint text, crawled widgets, partial pages, and unfinished rows instead of clean summary closers.
+3. Dirty data: better than before. The edited samples now include inline ads, frozen uploads, cropped thumbnails, copied rows, broken PDF/sign fragments, and partial lists. I removed several places where the mess was merely narrated as a final observation.
+4. Voices: improved in wood and record; still not allowed to collapse into one calm curator voice. Edits added annoyed shoppers, claimants, county notices, volunteers, forum OPs, and imperfect listing/review prose.
+5. Token placement: no edited sample starts with the target token. Several edited samples put ` log` in the middle or late text, including longer wood paragraphs and raw deploy output.
+6. Curator intros: reduced. I replaced several `X says/shows/notes` and field-label openings with the actual artifact or a mid-content fragment. Some natural headings remain where plausible, such as manuals, receipts, and tables.
+7. Length distribution: acceptable, though still mostly short/medium. I did not force artificial length expansion because the user called length acceptable in the prior pass.
+8. Repetitive arcs: specifically attacked. Removed the exact capper examples and changed multiple final meta lines into raw continuation, repeated rows, or abrupt endings.
+9. Abrupt fragments: improved. Some samples now end on `14:04:23`, a copied title, a partial print preview, or recipe steps rather than a tidy explanatory sentence.
+10. Non-natural-language content: retained across sections. Math still has CSV, formulas, code, proofs, docs; record still has raw logs/config/export rows; wood still has signs, product HTML, manuals, receipts, and scanned snippets.
+11. Tone: broader, but not theatrical. There are frustrated, bored, practical, automated, and promotional voices mixed with neutral material.
+12. Topic/domain balance: wood was the biggest risk. I converted another batch away from inventory/field-note structure into reviews, news-style snippets, school/museum text, claim uploads, blog fragments, and public notices.
+13. Final meaning recheck: duplicate ASTR content was removed and replaced; no intentional authentication `log in`, `login`, `logout`, `logic`, `logo`, or unrelated `logistic` target usages were added.
+
+Final sweep note: I found and removed one wood-label hazard where ` logging camp archive` created a target-shaped occurrence with the process/industry meaning rather than a physical log meaning. I also reduced the last polished `The...` wood openings into fragments or artifact-style text. Post-sweep checks are clean for missing exact tokens, forbidden near-matches, duplicate samples, and ASCII-only content.
+
+## Retrospective Learnings
+
+These are the repeated failure modes from this token and should be carried into future sample rewrites:
+
+- Exact-token checks are necessary but not sufficient. Samples that look visually valid can contain only `.log`, `log_`, `log(`, uppercase `LOG`, or line-initial `log`, none of which guarantee the intended lowercase leading-space token. Run the exact missing-token scan late, then manually inspect every fix for meaning.
+- Every target-shaped occurrence matters, including embedded longer words. ` logging camp archive` looked harmless in a wood sample, but ` logging` was the timber-industry process, not a physical log. The same hazard applies to `logistic`, `logbook`, `logged`, `lognormal`, and similar forms depending on label.
+- Avoid overcorrecting one critique into the opposite template. This token went through three swings: logarithm started too formula/code-heavy, then too explainer-heavy; record started too output-plus-quip, then too essay/meta-heavy; wood started too inventory/field-note-heavy. Future rounds should rebalance in smaller batches and immediately compare against the full label distribution.
+- Do not let samples end with a curator punchline by default. Lines like `thread title never fixed`, `footer repeats top answers`, or `volunteer note: ...` are individually plausible, but repeated endings create a house rhythm. Some samples should end mid-row, mid-command, mid-print-preview, or simply stop after the artifact.
+- Embed mess instead of describing it. Prefer actual HTML fragments, repeated footers, broken CSV rows, ad blocks, OCR misreads, clipped captions, and merged table text over prose that says the OCR/PDF/crawler did something.
+- Count-based pattern audits help catch style drift. Useful quick checks included starts with `The/A/An`, narrator verbs such as `says/shows/warns/explains`, duplicate exact samples, forbidden near-matches, and a rough wood colon-label heuristic.
+- Curator framing can hide inside plausible source labels. Some headings are natural, but repeated `The page says`, `A post explains`, `the export shows`, or `field: value` structures make the dataset feel written by a summarizer. Convert a portion into raw artifacts, quoted replies, partial pages, or direct prose from inside the source.
+- Cross-meaning passages are useful only when every exact target occurrence is label-correct. For this dataset, it was safer to avoid mixed passages where a record log and math log or cabin log appeared together unless manually checked very carefully.
+- Duplicate detection should include near-duplicates, not only exact string duplicates. The ASTR homework pair used the same formula, values, student mistake, and grader correction with small wording changes; exact duplicate scans would not catch that.
+- The final pass should answer `always_check.md` harshly in writing before stopping. If any answer requires "mostly" or "probably," do another targeted edit pass rather than rationalizing the issue away.
