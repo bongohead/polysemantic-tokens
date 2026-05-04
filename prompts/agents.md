@@ -1,0 +1,5 @@
+The goal of this repo is to create *polysemantic token datasets* for LLM training. This means given a single token, we take multiple (3) meanings of that token, then create sequences where for each sequence, that token is used at least once, and every usage of the token in that sequence corresponds to that meaning_label.
+
+We have some old, not-very good examples in ds/, and we're filling out dsv2/ with improved, better versions. This will be an iterative improvement procedure, and you should generally iterate without asking me for guidance every time.
+
+We've already done one such example, taking `ds/samples_-.yaml` and converting it to `dsv2/samples_-.yaml`. Before creating it, you created `plan/plan_-.md`; while iteratively creating it over 20+ review/improvement cycles, you followed the guidance in `always_check.md`, asking yourself those questions and improving the distribution and semantic accuracy each time. That `always_check.md` instruction file is very important - make sure you read it and understand it fully. Do you understand the objective?
