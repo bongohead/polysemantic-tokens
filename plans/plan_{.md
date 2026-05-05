@@ -42,6 +42,8 @@ For this token, ambiguity is the biggest risk:
 
 During sample writing, scan every `" {"` occurrence and ask what the opening brace is doing syntactically. If any occurrence has another meaning, rewrite or remove it.
 
+Also ask whether the meaning is already semantically clear before the token occurs. Prefer `trusted port set P = { 80,443 }` over `P = { 80,443 }`, `function render() {` over a bare identifier followed by a brace, and `review_request_email.tpl\nSubject: How is { item_name }` over `Subject: How is { item_name }` when the opening would otherwise be generic. The reader/model should not need to look past the brace to infer the label.
+
 ## Distribution Guidance
 
 Use approximate distributions, not exact quotas.
@@ -225,6 +227,7 @@ Per sample:
 
 - Contains exact token `" {"`.
 - Every exact `" {"` occurrence has the target meaning.
+- By the time each exact `" {"` occurs, the surrounding text before it has already made that meaning clear: set context before a set brace, block/scope context before a programming block brace, and template/field/placeholder context before a placeholder brace.
 - Across the label, contributes to a healthy mix of spaced-after-brace and unspaced-after-brace forms.
 - Does not start with the target token, and usually avoids placing it extremely early.
 - Avoids curator-style introductions unless they are genuinely part of the raw artifact.

@@ -62,6 +62,7 @@ For each 20-sample batch:
 These are the recurring failure modes found while building this token. Treat them as required checks before considering the file done.
 
 - Literal start scans are not enough. A sample can pass `^cell` checks while still placing exact `" cell"` in the first few characters through openings like `A cell`, `Every cell`, `Single cell`, `active cell`, or `A cell phone`. Run a stricter early-placement scan and rewrite the strongest offenders with plausible artifact context.
+- Sample-level unambiguity is not enough. By the time the first exact `" cell"` appears, the preceding text should already establish the intended sense. For this token, prefer prefixes like `white blood`, `T`, `onion epidermis`, `integrin-knockdown`, `FACS`, `worksheet`, `workbook`, `spreadsheet`, `mobile`, `phone`, `SIM`, `text-message`, or `handset` before the target. Avoid relying on words after the target, such as `cell B4`, `cell phone`, `cell migration`, or `cell culture`, unless earlier context already resolves the sense.
 - Curator-style wrappers creep in even after cleanup. Phrases like `From the old...`, `local news draft`, `product review`, `worksheet export`, or `the page says` should be removed unless the label is clearly part of the scraped artifact. Prefer raw headings, rows, timestamps, or body text.
 - `cell_phone` is the easiest label to overfit. Repeated clusters appeared around coverage complaints, outages, broken/lost phones, repair tickets, family anecdotes, school/work/court policies, contact-form administration, evidence/legal intake, asset management, marketplace listings, and delivery-driver workflows. These are valid in moderation but should not dominate.
 - Strong `cell_phone` diversity came from adding domains that were initially missing: fiction excerpts, academic/methods prose, historical directory text, advertising copy, medical/health reminders, travel fragments, elderly/accessibility setup notes, raw HTML, event logistics, privacy writing, media production, and mundane incidental mentions.
@@ -601,3 +602,88 @@ Checks run:
 - stricter early-placement scan for exact `" cell"` near the beginning of sample text
 
 Final harsh note: the remaining early-ish occurrences are mostly realistic raw fragments (`field 1 cells counted`, `Panel A: cell spreading`, `Section 2: cell C9`) where delaying the token further would make the artifact less natural. The stronger constraint failures have been fixed.
+
+## Eleventh-Pass Final Sweep: Pre-Token Semantic Clarity
+
+Focus: applied the stronger constraint that the intended meaning should be clear before the exact token is reached, not merely somewhere later in the sample. This is stricter than the earlier semantic scan.
+
+Final edits:
+
+- Biology: rewrote weak first occurrences so the prefix establishes life-science context before `" cell"`, e.g. `integrin-knockdown`, `image segmentation`, `receptor-binding assay`, `biopsy grant`, `oxidative-stress assay`, `FACS`, `mammalian`, `developmental biology`, `microfluidic`, `flow cytometry`, `organoid protocol`, `fibroblast forum`, `single-cell library`, `wound assay`, `nuclei segmentation`, and `chromatin`.
+- Spreadsheet: rewrote address-style openings so `worksheet`, `spreadsheet`, `workbook`, `sheet`, `gradebook`, `formula`, `XLSX`, `Sheets`, or similar cues appear before `cell B4`, `cell A1`, `cell P12`, `cell E204`, etc.
+- Phone: rewrote many `cell phone` samples so `phone`, `mobile`, `handset`, `SIM`, `IMEI`, `SMS`, `charger`, `barcode`, `camera`, `privacy`, `ticketing`, or similar cues appear before the first exact target. Also softened several new cue labels into more natural artifact text to avoid reintroducing repetitive curator-style openings.
+
+Final distribution after this pass:
+
+- `biological_cell`: 100 samples; min 97, p25 239, median 276, p75 330, p90 502, max 978, avg 318.8; 1 very short, 31 short, 64 medium, 4 long.
+- `spreadsheet_cell`: 100 samples; min 90, p25 227, median 278, p75 318, p90 461, max 812, avg 309.4; 1 very short, 29 short, 67 medium, 3 long.
+- `cell_phone`: 100 samples; min 131, p25 221, median 258, p75 331, p90 414, max 539, avg 281.1; 45 short, 55 medium.
+- Overall: 300 samples; 2 very short, 105 short, 186 medium, 7 long.
+
+Checks run:
+
+- `python scripts/check_length_distribution.py dsv2/samples_cell.yaml`
+- exact-token presence scan for every sample
+- literal start-token scan for lowercase/uppercase `cell`, `cells`, `cellular`, and `cellphone`
+- stricter early-placement scan for exact `" cell"` near the beginning of sample text
+- excluded-sense scan including prison/jail/holding, battery, fuel, solar, storage, table, Jupyter, and unrelated-prefix senses
+- wrapper-start scan
+- first-occurrence pre-token semantic-cue heuristic by label
+
+Final harsh note: this pass improved semantic timing but slightly increased prefix cue density, especially in `cell_phone`. I softened the most label-like additions, but future tokens should try to bake pre-token cues into natural syntax from the start instead of adding headings late.
+
+## Twelfth-Pass Final Sweep: Contextual Ambiguity Tightening
+
+Focus: did another manual/contextual pass after the pre-token semantic-cue audit. The goal was not only to have an anchor word before the target, but to make that anchor naturally disambiguating.
+
+Final edits:
+
+- Biology: clarified borderline prefixes such as `pre-warm medium`, `competent cells`, `plate B has weird cell edges`, `B cell depletion`, and `unstained cells ok` by adding stronger natural context: `culture medium`, `competent E. coli`, `culture plate B`, `immunology infusion`, and `flow cytometry controls`.
+- Spreadsheet: clarified UI/chat fragments where `cell` could otherwise read as a generic grid/UI unit before the spreadsheet context arrived. Added natural spreadsheet/workbook cues to examples like the blue cell click, macro highlighting, kiosk export, validation warning, and agency tracker.
+- Phone: clarified phone examples where the pre-target cue was present but thin, including the promo HTML, travel phone sentence, QR cleanup note, and cabin photo log. Added earlier mobile/phone wording without changing the phone sense.
+
+Final distribution after this pass:
+
+- `biological_cell`: 100 samples; min 97, p25 239, median 278, p75 330, p90 502, max 978, avg 319.4; 1 very short, 30 short, 65 medium, 4 long.
+- `spreadsheet_cell`: 100 samples; min 90, p25 232, median 278, p75 320, p90 461, max 812, avg 310.6; 1 very short, 29 short, 67 medium, 3 long.
+- `cell_phone`: 100 samples; min 131, p25 221, median 260, p75 332, p90 414, max 539, avg 281.4; 45 short, 55 medium.
+- Overall: 300 samples; 2 very short, 104 short, 187 medium, 7 long.
+
+Checks run:
+
+- `python scripts/check_length_distribution.py dsv2/samples_cell.yaml`
+- exact-token presence scan for every sample
+- literal start-token scan for lowercase/uppercase `cell`, `cells`, `cellular`, and `cellphone`
+- excluded-sense scan including prison/jail/holding, battery, fuel, solar, storage, table, Jupyter, and unrelated-prefix senses
+- wrapper-start scan
+- first-occurrence pre-token semantic-cue heuristic by label
+
+Final harsh note: the remaining ambiguous-looking cases are mostly only ambiguous if stripped of their immediate prefix. In context, the first target is now preceded by meaningful cues rather than relying on words after `cell` to establish the label.
+
+## Thirteenth-Pass Final Sweep: Thin-Cue Cleanup
+
+Focus: did one more final pass over places where the prior heuristic was technically satisfied but the prefix still felt too thin. The target should be clear to a reader before reaching `" cell"`, not merely recoverable from a header like `contact_cell` or from a later word like `phone`.
+
+Final edits:
+
+- Spreadsheet: clarified the fundraiser example by making the first line refer to the fundraiser spreadsheet before `cell B2`.
+- Phone: clarified four thin-prefix examples: the phone-case Q&A now cues a phone case before `cell phone`; the wedding gallery CSV uses `contact_phone` before `cell phone upload`; the volunteer CSV uses `contact_phone` before `call cell`; the inspection photo sample mentions phone metadata before `inspector cell phone`.
+- Rechecked the fixes for curator-ish introductions and softened the new cues so they read as artifact content rather than descriptions of artifacts.
+
+Final distribution after this pass:
+
+- `biological_cell`: 100 samples; min 97, p25 239, median 278, p75 330, p90 502, max 978, avg 319.4; 1 very short, 30 short, 65 medium, 4 long.
+- `spreadsheet_cell`: 100 samples; min 90, p25 232, median 278, p75 320, p90 461, max 812, avg 310.8; 1 very short, 29 short, 67 medium, 3 long.
+- `cell_phone`: 100 samples; min 131, p25 222, median 260, p75 332, p90 414, max 539, avg 282.1; 43 short, 57 medium.
+- Overall: 300 samples; 2 very short, 102 short, 189 medium, 7 long.
+
+Checks run:
+
+- `python scripts/check_length_distribution.py dsv2/samples_cell.yaml`
+- exact-token presence scan for every sample
+- literal start-token scan for lowercase/uppercase `cell`, `cells`, `cellular`, and `cellphone`
+- excluded-sense scan including prison/jail/holding, battery, fuel, solar, storage, table, Jupyter, and unrelated-prefix senses
+- wrapper-start scan for known curator-style openings
+- every-occurrence pre-token semantic-cue heuristic by label
+
+Final harsh note: the final remaining risk is not semantic ambiguity but the unavoidable token tension in `cell_phone`, where exact-token pressure can make `cell phone` repeat more than ordinary prose would. The last pass removes the cases where that repetition arrived before a strong phone cue.

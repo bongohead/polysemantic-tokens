@@ -38,6 +38,7 @@ Use approximate distributions, not exact quotas.
 - Length: include a few very short fragments, many short and medium samples, and a meaningful minority of long messy samples.
 - Token placement: do not start any sample with `" match"`. In longer samples, ensure the target token appears late sometimes, not only in the opening sentence or first row.
 - Token placement QA should use the literal exact target, not only word-boundary matching. Check that every sample contains lowercase `" match"` after interpreting escaped newlines, that no sample starts with it, and that the first exact target is usually delayed by several characters. During final cleanup, aim for zero samples with the first exact target in the first 8 characters unless there is a strong raw-format reason.
+- Left-context clarity: by the time each exact `" match"` occurrence appears, the reader should already have enough context to know the intended meaning. Prefer `candle-drawer matchbox`, `tennis match`, `regex match`, or `paint scanner match` over phrasing where the disambiguating word arrives after the token. This matters especially for compounds such as `matchbox`, `matchbook`, `match safe`, `match thread`, `match score`, and generic openings like `this match`.
 - Token density: use enough target tokens to make the meaning clear, but avoid stuffing. Sports and search/code samples can naturally repeat ` match`; ignition-stick samples often need fewer repetitions. If a sample has 7+ exact-target occurrences, inspect it manually and replace some repetitions with natural pronouns, `bout`, `fixture`, `row`, `candidate`, `segment`, or other domain terms.
 - Source mix: include technical, educational, commercial, outdoor, workplace, informal, structured, newsy, crawled/OCR, and auto-generated styles.
 - Voice and tone: vary between neutral machine output, terse notes, confused users, polished docs, excited fans, frustrated support text, safety/legal boilerplate, mundane listings, and raw logs.
@@ -212,6 +213,7 @@ For each `pattern_correspondence` round, deliberately cover several of:
 After each round:
 
 - Search every exact `" match"` occurrence and classify it manually.
+- For each sample, inspect the immediate left context before the first exact target. If the sample only becomes clear after the target appears, rewrite the prefix so the meaning is already established without adding a curator label. Typical fixes are small domain cues such as `wooden`, `striker`, `candle`, `tennis`, `chess`, `regex`, `paint scanner`, `route table`, or `HLA`.
 - Search for high-risk continuations and phrases: ` matcha`, ` matchless`, ` matchlock`, ` matchbox`, ` matchbook`, ` matchday`, ` match score`, ` matching`, ` matches`, ` matched`, ` matchmaking`, ` match_id`, ` match-3`, ` match three`, ` price match`, ` employer match`, ` donation match`, ` matching gift`, ` grant match`, ` no match`, ` no match for`, ` met his match`, and language-keyword patterns such as `let result = match`, `Kind::`, or `case _`.
 - Check that no sample starts with the target and that first target positions vary. For final QA, compute exact `" match"` positions after unescaping `\n`; try to make `first_exact_under_8=0`.
 - Check that long samples contain some late target occurrences.
@@ -240,6 +242,7 @@ Per sample:
 - Contains exact lowercase token `" match"` at least once.
 - Every occurrence of `" match"` has the target meaning, including occurrences inside longer lowercase words such as `matches`, `matched`, `matching`, `matchbox`, `matchbook`, `matchday`, or `matchmaking`.
 - Does not start with the token and usually delays the first exact target by several characters. Final version should have zero samples with the first exact `" match"` before character index 8 unless a deliberate raw-format exception is documented.
+- Establishes the intended sense before the target token appears, especially at the first exact target. Avoid `this match`, `a match`, or bare `matchbox` openings unless the left context already says sports, fire, or correspondence.
 - Avoids curator-style source introductions unless they are naturally part of the artifact.
 - Is plausible as web/SFT corpus text, with realistic messiness and no theatrical over-explanation.
 - Avoids unrelated `matcha`, `matchless`, `matchlock`, sports/fire/correspondence cross-contamination, and uppercase-only target reliance.
@@ -257,3 +260,11 @@ Per meaning:
 - Has natural target density; repeated `match` tokens should feel like the source genre, not like dataset construction.
 - Includes short fragments, medium artifacts, and some long messy samples.
 - Manually inspect high-risk cases where `match` could mean a fire object, a sports event, or a correspondence relation in nearby text.
+
+## 2026-05-05 Final Context-Ambiguity Pass
+
+Final pass tightened a few defensible but less immediate first-use contexts:
+
+- Sports: made bracket and ladder examples explicit before the first target by changing `upper final match` to an esports final and `ladder challenge match` to a club tennis ladder challenge.
+- Pattern correspondence: made UI/config examples clearer before the first target by changing `filter mode` to `saved-search filter mode` and giving the queue widening row a `Rule engine` prefix.
+- Rechecked high-risk leftovers. `match server` remains only in an esports event sample after clear bracket context; bipartite `matching` remains under pattern correspondence because the cost-matrix and edge-set context establish correspondence before the target.

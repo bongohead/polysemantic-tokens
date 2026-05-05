@@ -24,7 +24,7 @@ The target is a literal space followed by lowercase `scale`.
 
 ## Realism Standard
 
-Samples should feel like mixed C4/HPLT-style web data rather than curated examples. Use raw excerpts directly when plausible: hiking reports, climbing route notes, emergency manuals, police blotters, game text, product listings, calibration logs, lab SOPs, freight tickets, recipes, support tickets, survey exports, chart configs, CSS snippets, policy reports, forum replies, OCR/PDF text, tables, emails, and partial scraped pages.
+Samples should feel like mixed C4/HPLT-style web data rather than curated examples. Use raw excerpts directly when plausible: hiking reports, climbing route notes, emergency manuals, police blotters, game text, product listings, calibration logs, lab SOPs, freight tickets, recipes, support tickets, survey exports, policy reports, forum replies, OCR/PDF text, tables, emails, and partial scraped pages.
 
 Good data can be clipped, mundane, redundant, malformed, or surrounded by irrelevant web residue. Include plausible artifacts such as repeated headers, ad placeholders, cookie banners, broken captions, table fragments, JSON/CSV rows, timestamps, OCR line breaks, units, form labels, old nav text, moderation tags, missing context, and copied comments.
 
@@ -54,13 +54,14 @@ For each 20-sample batch:
 - Add a few structured or non-prose artifacts: CSV, JSON, code/config, tables, forms, logs, OCR, or copied webpage residue.
 - Add at least one longer messy sample per label if the current label is becoming too clean.
 - Remove samples that need a curator explanation to disambiguate the sense.
+- Apply the left-context rule: by the time the first exact `" scale"` token appears, the prior text should already make the intended meaning clear. Avoid first mentions like bare `scale the wall`, `north scale`, or `the scale of...` if the wall/device/scope cue arrives only after the token; move the cue left naturally.
 - Track topic clusters so the label does not collapse into only mountains, only kitchen scales, or only `large scale` business prose.
 
 Approximate source mix targets:
 
 - `climb`: roughly one third outdoor/mountaineering, one quarter barriers/security/incidents, one fifth games/fiction/training/obstacle courses, and the remainder animals/robots/unusual scraped artifacts.
 - `weighing_instrument`: roughly one quarter household/consumer, one quarter freight/agriculture/warehouse, one quarter lab/medical/regulatory, and one quarter device/software/support/OCR/commercial miscellany.
-- `size_or_level`: keep this especially spread out: no more than about one quarter `large scale`/`at scale` prose, with substantial representation from rating systems, map/model/chart/CSS scale, code/config transforms, research methods, pay/grading scales, and operational capacity.
+- `size_or_level`: keep this especially spread out: no more than about one quarter `large scale`/`at scale` prose, with substantial representation from civic scope, operational capacity, research sample size, legal discovery, public events, archives, manufacturing, economics, household logistics, scientific aggregation, and routine magnitude descriptions. Do not use rating systems, map/model ratios, chart/CSS/log scales, or visual transforms in the narrowed dataset.
 
 ## `climb`
 
@@ -215,7 +216,7 @@ Second-pass rewrite targets:
 
 Follow-up iteration notes:
 
-- Treat `size_or_level` as scope/magnitude/capacity/level. Do not reintroduce map/model, CSS transform, chart-axis/logarithmic, musical, fish, mineral, weighing, or climbing senses. Limited 1-10 or plain rating-level examples are acceptable now, but they should not dominate.
+- Treat `size_or_level` as scope/magnitude/capacity/level. Do not reintroduce map/model, CSS transform, chart-axis/logarithmic, rating-system, musical, fish, mineral, weighing, or climbing senses.
 - Watch the section for overuse of multi-row `local scale / regional scale / national scale` comparisons. Tables are useful, but too many of them make the label feel like one template.
 - Watch for the "competent operations person explains the scaling bottleneck" voice. Add confused users, marketing overclaims, angry public comments, academic fragments, news snippets, executive demands, and raw autoscaling output.
 - Context labels were a major weakness in the first draft. Prefer artifact content directly; if a line starts with `report`, `memo`, `transcript`, `ticket`, `review`, `post`, `OCR`, or similar, assume it needs to be challenged.
@@ -741,6 +742,17 @@ Final residual note:
 
 I would stop here. The remaining weakness is not semantic clarity or format diversity; it is only that `size_or_level` has a slightly shorter length profile than the other labels. Forcing more length now would likely reintroduce the polished explanatory voice we spent several passes removing.
 
+## 2026-05-05 Left-Context Ambiguity Sweep
+
+User feedback added the stricter constraint that the intended sense should be semantically clear before the target token appears. I applied this to `dsv2/samples_scale.yaml` after the main completion pass.
+
+- `climb`: rewrote first mentions where the surface arrived only after the target, e.g. bare `scale the fence/wall/ridge`, so the prior text now cues a physical climb through a wall, fence, ridge, rope, route, barrier, or similar surface.
+- `weighing_instrument`: rewrote bare device references like `north scale`, `scale head`, `scale reading`, `scale_port`, and `open scale connection` so the prior text names a truck, kitchen, postage, bench, bathroom, or produce weighing device.
+- `size_or_level`: tightened a few first mentions so the scope cue precedes `scale`, and rewrote `Continental scale maps` to avoid the excluded map-scale neighborhood.
+- Verification after the sweep: YAML parses; 300 samples total; 100 per label; zero missing exact lowercase `" scale"` occurrences; zero samples start with the target.
+
+Follow-up ambiguity sweep: I rechecked all exact lowercase occurrences, not only first mentions. Additional fixes removed or clarified delayed-context cases such as `scale test again`, `scale cargo net`, `scale final ramp`, `scale the warehouse wall`, `scale fence near post`, `at quarry scale now`, `entering scale`, `choose one scale`, and `portfolio scale risk`. Final targeted scan found no `scale up/out/down`, `scale test`, map/rating/model/CSS false-neighbor patterns, or `risk scale` adjacency in the dataset.
+
 ## Consolidated Learnings For Future Tokens
 
 Repeated failure modes found while iterating on `" scale"`:
@@ -765,3 +777,11 @@ Reusable final audit pattern:
 - Run excluded-sense scans per label, then manually judge false positives.
 - Scan for repeated narrative arcs and meta-commentary phrases, not just keywords.
 - Run length distribution and decide whether length repair would improve realism or merely add padded prose.
+
+## 2026-05-05 Final Context-Ambiguity Pass
+
+Final pass focused on abstract `size_or_level` cases where the sense was valid but could read too idiomatic or delayed:
+
+- Replaced two `economies of scale` phrasings with `production scale` and `township-wide scale` so the scope/operating-size sense is explicit before the token.
+- Rephrased `Market scale operations` to `At this market's scale` and `Large scale reef coverage` to `regional scale` so the target arrives after a clearer scope cue.
+- Rechecked device compounds such as `truck scale`, `bench scale`, `lab scale`, and `cattle scale`; these remain because the left modifier already establishes a weighing instrument before the target.

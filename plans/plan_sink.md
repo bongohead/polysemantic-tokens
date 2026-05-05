@@ -294,6 +294,7 @@ Per sample:
 
 - Contains exact lowercase token `" sink"` at least once.
 - Every occurrence of `" sink"` has the target meaning, including occurrences inside longer lowercase strings such as `sinks`, `sinking`, `sinkhole`, `sinker`, `sink_id`, and `sink:`.
+- By the time each exact `" sink"` occurrence is reached, the prior text has already anchored the sense. Prefer `kitchen sink`, `lab sink`, `heat sink`, `vertical sink rate`, or an already-established local context over bare first uses such as `the sink`, `sink base`, `sink temp`, or `sink rate` that only become clear after the token.
 - Does not rely on uppercase, line-start, underscore-prefixed, slash-prefixed, or hyphenated lookalikes such as `Sink`, `sink` at line start, `_sink`, `/sink`, `under-sink`, `heat-sink`, or `source-sink`.
 - Does not start with the token and usually delays the first target by several tokens.
 - Avoids curator-style source introductions unless they are naturally part of the artifact.
@@ -319,6 +320,8 @@ Per meaning:
 - `descend_below_surface` initially overused progressive/inchoative aspect (`started sinking`, `keeps sinking`). It now needs deliberate simple present and simple past coverage: `sinks`, `sank`, `did sink`, factual physics/instructions, and completed incident reports.
 - Long samples should be checked for late target occurrences. Two long descent rows were semantically valid but had the last exact target too early; adding natural late occurrences improved token placement without changing the label distribution.
 - Narrator framing can creep in when writing review artifacts. Prefer embedded artifacts (`REVIEWER:`, comments, tables, thread snippets) over descriptions like "Reviewer asks whether...".
+- The pre-token semantic-clarity check caught many rows that were correct only after reading past the target: `Set the sink...`, `sink base`, `sink temp`, `stock sink`, `captive sink screws`, `junction to sink`, and similar bare uses. Fix by adding a natural cue before the target token itself (`kitchen sink`, `lab sink`, `heat sink`, `vertical sink rate`, `basin sink drain`) rather than relying on following words or later explanation.
+- A later ambiguity pass found that excluded senses can still leak in as contrast or metadata, not just as the main target use. In `heat_absorber`, phrases like `software sink`, `the word sink`, or nearby kitchen/plumbing category chatter should be removed or rewritten even when surrounded by valid `heat sink` text. Clearer local wording such as `heat sink clip`, `heat sink temp`, `heat sink body`, and `heat sink line` is better than compact shorthand when ambiguity is possible.
 
 ## Second-Pass Always-Check Answers
 

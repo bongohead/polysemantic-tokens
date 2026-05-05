@@ -196,6 +196,7 @@ After each round:
 - Search every exact `" log"` occurrence and classify it manually.
 - Scan for ` login`, ` logout`, ` logic`, ` logical`, ` logistics`, ` logo`, ` log in`, and ` logged in`.
 - Check that the first exact target token is not at the beginning and is not always in the first clause.
+- Check that by the time the first exact target token appears, the prior text already establishes the intended sense. Prefer `cedar log`, `application log`, or `log-scale axis` contexts over bare `the log` where disambiguation arrives only after the token.
 - Check that long samples contain some late target occurrences.
 - Rebalance if a label is becoming too tidy, too explanatory, too software-heavy, too classroom-heavy, or too cozy/outdoorsy.
 - Validate YAML structure before continuing.
@@ -206,6 +207,7 @@ Per sample:
 
 - Contains exact lowercase token `" log"` at least once.
 - Every occurrence of `" log"` has the target meaning, including occurrences inside longer lowercase words such as `logs`, `logged`, `logging`, `logbook`, or `lognormal`.
+- The meaning should be clear before or at the token, not only after reading the following words. For example, `cut log`, `event log`, and `natural log` are stronger than a bare `the log` that is only clarified by the next clause.
 - Does not start with the token and usually delays the first occurrence by several tokens.
 - Avoids curator-style source introductions unless they are naturally part of the artifact.
 - Is plausible as web/SFT corpus text, with realistic messiness and no theatrical over-explanation.
@@ -258,3 +260,13 @@ These are the repeated failure modes from this token and should be carried into 
 - Cross-meaning passages are useful only when every exact target occurrence is label-correct. For this dataset, it was safer to avoid mixed passages where a record log and math log or cabin log appeared together unless manually checked very carefully.
 - Duplicate detection should include near-duplicates, not only exact string duplicates. The ASTR homework pair used the same formula, values, student mistake, and grader correction with small wording changes; exact duplicate scans would not catch that.
 - The final pass should answer `always_check.md` harshly in writing before stopping. If any answer requires "mostly" or "probably," do another targeted edit pass rather than rationalizing the issue away.
+
+## Prefix-Clarity Sweep
+
+After final review, I added one more constraint pass: the intended meaning should be established by the time the exact target token appears, not only after the next word or sentence. This found mostly weak wood openings such as `huge log`, `log strainer`, `log stools`, `real log beams`, and `log raft`, plus a few record/math cases like `please log every sample move` and bare `log lines`. I rewrote them toward pre-disambiguated forms such as `fallen log`, `cedar log`, `wood log`, `application log`, `record ... in the log`, and `Jensen proof, since log is concave`.
+
+For future tokens, this should be a required late-stage audit: print the context before the first exact token, not just the sentence containing it. If the text before the token could plausibly support another meaning, revise the sample so a classifier does not have to wait until after the target to know which sense it is seeing.
+
+Follow-up ambiguity sweep: after applying the prefix rule once, I did a stricter all-occurrences pass and found several cases that were technically correct but weaker than necessary. The fix pattern was to add the domain cue before the target: `application log` instead of bare verb `log card_token`, `router event log` instead of `router log`, `dock office log` instead of `dock log`, `wall clipboard log` instead of `wall log`, `hours log` instead of verb `log hours`, `fallen/driftwood/maple/wood/cherry log` instead of generic `log`, and `transform odds with a logarithm` instead of `odds ... logged`. Clearer is better even when the previous sample was probably inferable.
+
+Final ambiguity pass: I rechecked thin contexts such as `log4j2.xml`, `deck log`, `service log`, glossary-table `log | ...`, `hollow log`, `front log`, `rear log`, `small log`, and prop/toy uses. I clarified these with cues like `application log config`, `research cruise deck log`, `kiosk service log`, `event log | ...`, `hollow wood log`, `front ceramic log`, `rear ceramic log`, `small toy log`, `wood log slice`, and `chained wooden log barrier`. The important rule is to prefer a slightly redundant modifier over making the model infer the sense from later words.
