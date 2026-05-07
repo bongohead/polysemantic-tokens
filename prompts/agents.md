@@ -51,6 +51,13 @@ Getting close. Please address the below issues. Remember, you can re-read the sa
 As always, reread the questions at the end and iterate more if needed. You should iterate at least X times, and continue to search for improvements to distribution or semantic meaning clarity/accuracy until at least X:XXpm. Do not pause or stop until then; there are always places to keep looking for improvements.
 
 ---
+Mostly good, make sure all sequences satisfy this constraint:
+
+When the token of interest is used, by that point, is it already semantically clear what the meaning is? For example "The shell is a clam" versus "The clam shell.." - the later is preferred if the token of itnerest is "shell", since the latter establishes meaning already by the time "shell" occurs.
+---
+Do one final run through and make sure there's no contextual ambiguity and resolve any you see. Clearer is better.
+---
+
 
 
 Excellent work. Do one last sweep and make sure those questions could all be answered now. Any last improvements you want to make for either diversity or to resolve this questions or to improve semantic clarity?
